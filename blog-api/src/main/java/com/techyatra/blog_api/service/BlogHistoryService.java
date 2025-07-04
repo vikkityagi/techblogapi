@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class BlogHistoryService {
@@ -30,10 +31,10 @@ public class BlogHistoryService {
         return repo.findByUserEmail(email);
     }
 
-    public void markAsPaid(String email, String title) {
-        BlogHistory history = repo.findByUserEmailAndBlogTitle(email, title);
+    public void markAsPaid(UUID id, Boolean status) {
+        BlogHistory history = repo.findById(id).orElse(null);
         if (history != null) {
-            history.setIsPaid(true);
+            history.setIsPaid(status);
             repo.save(history);
         }
     }

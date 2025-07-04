@@ -20,4 +20,6 @@ public interface BlogRepository extends JpaRepository<Blog, UUID> {
 
     @Query("SELECT b FROM Blog b WHERE b.titleNumber = ?1")
     Blog findByTitleNumber(String titleNumber);
+
+    // List<Blog> findAllBlogByDate();
 }

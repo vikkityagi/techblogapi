@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/history")
@@ -29,8 +30,8 @@ public class BlogHistoryController {
         return service.getHistory(email);
     }
 
-    @PostMapping("/mark-paid")
-    public void markPaid(@RequestParam String email, @RequestParam String title) {
-        service.markAsPaid(email, title);
+    @GetMapping("{id}/pay/{status}")
+    public void markPaid(@PathVariable UUID id, @PathVariable Boolean status) {
+        service.markAsPaid(id, status);
     }
 }
