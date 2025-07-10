@@ -3,6 +3,8 @@ package com.techyatra.blog_api.model;
 
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.techyatra.blog_api.auditclass.BaseClass;
 
 import jakarta.persistence.*;
@@ -22,7 +24,9 @@ public class BlogHistory extends BaseClass {
 
     private String userEmail;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "blog_id", nullable = false)
+    @JsonIgnoreProperties
     private Blog blog;
 
     @Column(nullable = false)

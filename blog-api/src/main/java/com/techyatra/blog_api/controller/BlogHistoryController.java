@@ -31,7 +31,7 @@ public class BlogHistoryController {
     }
 
     @GetMapping("{id}/pay/{status}")
-    public void markPaid(@PathVariable UUID id, @PathVariable Boolean status) {
-        service.markAsPaid(id, status);
+    public boolean markPaid(@PathVariable UUID id, @PathVariable Boolean status) {
+        return service.markAsPaid(id, status);
     }
 }

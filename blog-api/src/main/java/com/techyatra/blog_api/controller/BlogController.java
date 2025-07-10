@@ -2,8 +2,11 @@ package com.techyatra.blog_api.controller;
 
 import com.techyatra.blog_api.model.Blog;
 import com.techyatra.blog_api.service.BlogService;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -25,8 +28,9 @@ public class BlogController {
     }
 
     @GetMapping
-    public List<Blog> getAllBlogs() {
-        return service.getAll();
+    public List<Blog> getAllBlogs(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+        return service.getAll(fromDate, toDate);
     }
 
     @GetMapping("/today")
@@ -52,5 +56,10 @@ public class BlogController {
     @GetMapping("/{id}")
     public Blog getBlogById(@PathVariable UUID id) {
         return service.getById(id);
+    }
+
+    @GetMapping("/latest")
+    public Blog getLatestBlog() {
+        return service.getLatestBlog();
     }
 }

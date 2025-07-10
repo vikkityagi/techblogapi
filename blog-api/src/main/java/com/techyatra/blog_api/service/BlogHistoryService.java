@@ -31,11 +31,13 @@ public class BlogHistoryService {
         return repo.findByUserEmail(email);
     }
 
-    public void markAsPaid(UUID id, Boolean status) {
+    public boolean markAsPaid(UUID id, Boolean status) {
         BlogHistory history = repo.findById(id).orElse(null);
         if (history != null) {
             history.setIsPaid(status);
             repo.save(history);
+            return true;
         }
+        return false;
     }
 }

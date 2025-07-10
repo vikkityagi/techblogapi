@@ -1,8 +1,11 @@
 package com.techyatra.blog_api.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.techyatra.blog_api.auditclass.BaseClass;
 
 import jakarta.persistence.*;
@@ -38,4 +41,6 @@ public class Blog extends BaseClass {
 
     @Column(nullable = false)
     private String titleNumber;
+
+    
 }

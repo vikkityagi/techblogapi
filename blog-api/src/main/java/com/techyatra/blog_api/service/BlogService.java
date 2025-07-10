@@ -2,9 +2,10 @@ package com.techyatra.blog_api.service;
 
 import com.techyatra.blog_api.model.Blog;
 import com.techyatra.blog_api.repository.BlogRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -27,17 +28,20 @@ public class BlogService {
         if (existingBlogWithSameTitle != null) {
             throw new IllegalArgumentException("Blog title already exists.");
         }
-
-        // blog.setDate(LocalDateTime.now());
-        // blog.setTitleNumber(blog.getTitleNumber().toUpperCase());   
-        // blog.setTitle(blog.getTitle().toUpperCase());
-        // blog.setContent(blog.getContent().toUpperCase());
-        // blog.setUser(blog.getUser().toUpperCase());
         return repo.save(blog);
     }
 
-    public List<Blog> getAll() {
-        return repo.findAll();
+    public List<Blog> getAll(LocalDate fromDate, LocalDate toDate) {
+        if (fromDate != null && toDate != null) {
+            if (fromDate.isAfter(toDate)) {
+                throw new IllegalArgumentException("From date cannot be after to date.");
+            }
+            System.out.println("Fetching blogs between dates: " + fromDate + " and " + toDate);
+            return repo.getDataBetweenDates(fromDate, toDate);
+        } else {
+            LocalDate now = LocalDate.now();
+            return repo.getDataBetweenDates(now.minusDays(7), now);
+        }
     }
 
     public void deleteByTitle(String title) {
@@ -58,5 +62,9 @@ public class BlogService {
 
     public Blog getById(UUID id) {
         return repo.findById(id).orElseThrow(() -> new IllegalArgumentException("Blog not found with id: " + id));
+    }
+
+    public Blog getLatestBlog() {
+        return repo.findLatestEntry();
     }
 }
