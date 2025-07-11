@@ -6,6 +6,8 @@ import com.techyatra.blog_api.repository.BlogHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,11 +26,19 @@ public class BlogHistoryService {
         if (existing == null) {
             return repo.save(history);
         }
-        return existing;
+        return history;
     }
 
-    public List<BlogHistory> getHistory(String email) {
-        return repo.findByUserEmail(email);
+    public List<BlogHistory> getHistory(String email, LocalDate fromDate, LocalDate toDate) {
+        if(fromDate != null && toDate != null) {
+
+            if (fromDate.isAfter(toDate)) {
+                throw new IllegalArgumentException("From date cannot be after to date.");
+            }
+            return repo.findByUserEmailAndCreatedAtBetween(email, fromDate, toDate);
+        }
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        return repo.findRecentBlogsByUserEmail(email, sevenDaysAgo);
     }
 
     public boolean markAsPaid(UUID id, Boolean status) {
