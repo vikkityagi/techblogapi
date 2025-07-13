@@ -3,6 +3,9 @@ package com.techyatra.blog_api.service;
 
 import com.techyatra.blog_api.model.User;
 import com.techyatra.blog_api.repository.UserRepository;
+
+import javax.management.RuntimeErrorException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,5 +36,16 @@ public class UserService {
 
     public User getByEmail(String email) {
         return repo.findByEmail(email);
+    }
+
+    public User reset(User user){
+        User newuser = repo.findByEmail(user.getEmail());
+        if(newuser != null){
+            newuser.setPassword(user.getPassword());
+            repo.save(newuser);
+        }else{
+            throw new RuntimeException("Invalid Email");
+        }
+        return user;
     }
 }

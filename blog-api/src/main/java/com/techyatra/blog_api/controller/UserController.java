@@ -30,4 +30,9 @@ public class UserController {
     public User getByEmail(@PathVariable String email) {
         return userService.getByEmail(email);
     }
+
+    @PostMapping("/reset")
+    public User resetPassword(@RequestBody User user) {
+        return userService.reset(user);
+    }
 }

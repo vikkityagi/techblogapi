@@ -22,6 +22,6 @@ public interface BlogHistoryRepository extends JpaRepository<BlogHistory, UUID> 
 
     @Query(value = "SELECT * FROM public.blog_history " +
             "WHERE created_at >= :fromDate " +
-            "AND created_at < (:toDate)::date + 1", nativeQuery = true)
+            "AND created_at < (:toDate)::date + 1 and user_email=:email", nativeQuery = true)
     List<BlogHistory> findByUserEmailAndCreatedAtBetween(String email, LocalDate fromDate, LocalDate toDate);
 }
