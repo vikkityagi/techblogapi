@@ -1,0 +1,15 @@
+com\techyatra\blog_api\service\BlogHistoryService.class
+com\techyatra\blog_api\BlogApiApplication.class
+com\techyatra\blog_api\repository\BlogHistoryRepository.class
+com\techyatra\blog_api\controller\BlogHistoryController.class
+com\techyatra\blog_api\ServletInitializer.class
+com\techyatra\blog_api\service\BlogService.class
+com\techyatra\blog_api\repository\BlogRepository.class
+com\techyatra\blog_api\controller\UserController.class
+com\techyatra\blog_api\repository\UserRepository.class
+com\techyatra\blog_api\model\User.class
+com\techyatra\blog_api\model\Blog.class
+com\techyatra\blog_api\model\BlogHistory.class
+com\techyatra\blog_api\service\UserService.class
+com\techyatra\blog_api\auditclass\BaseClass.class
+com\techyatra\blog_api\controller\BlogController.class
