@@ -1,12 +1,14 @@
 package com.techyatra.blog_api.service;
 
 import com.techyatra.blog_api.model.Blog;
+import com.techyatra.blog_api.model.BlogHistory;
 import com.techyatra.blog_api.repository.BlogRepository;
 
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,13 +33,21 @@ public class BlogService {
         return repo.save(blog);
     }
 
-    public List<Blog> getAll(LocalDate fromDate, LocalDate toDate) {
-        if (fromDate != null && toDate != null) {
+    public List<Blog> getAll(LocalDate fromDate, LocalDate toDate, UUID categoryId) {
+        if (fromDate != null && toDate != null && categoryId == null) {
             if (fromDate.isAfter(toDate)) {
                 throw new IllegalArgumentException("From date cannot be after to date.");
             }
             System.out.println("Fetching blogs between dates: " + fromDate + " and " + toDate);
             return repo.getDataBetweenDates(fromDate, toDate);
+
+        } else if (fromDate != null && toDate != null && categoryId != null) {
+            return repo.getDataBetweenDatesAndCategory(fromDate, toDate, categoryId);
+        } else if(fromDate == null && toDate == null && categoryId != null) {
+            LocalDate now = LocalDate.now();
+            return repo.findByCategoryIdBetweenDates(now.minusDays(7), now, categoryId);
+        } else if (fromDate == null && toDate == null && categoryId == null) {
+            return repo.findAll();
         } else {
             LocalDate now = LocalDate.now();
             return repo.getDataBetweenDates(now.minusDays(7), now);
@@ -67,4 +77,6 @@ public class BlogService {
     public Blog getLatestBlog() {
         return repo.findLatestEntry();
     }
+
+    
 }

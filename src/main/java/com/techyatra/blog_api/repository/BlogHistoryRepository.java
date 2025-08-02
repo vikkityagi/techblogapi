@@ -13,15 +13,24 @@ import com.techyatra.blog_api.model.BlogHistory;
 
 public interface BlogHistoryRepository extends JpaRepository<BlogHistory, UUID> {
 
-    @Query("SELECT b FROM BlogHistory b WHERE b.userEmail = :userEmail AND b.createdAt >= :sevenDaysAgo ORDER BY b.createdAt DESC")
-    List<BlogHistory> findRecentBlogsByUserEmail(@Param("userEmail") String userEmail,
-            @Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
+        @Query("SELECT b FROM BlogHistory b WHERE b.userEmail = :userEmail AND b.createdAt >= :sevenDaysAgo ORDER BY b.createdAt DESC")
+        List<BlogHistory> findRecentBlogsByUserEmail(@Param("userEmail") String userEmail,
+                        @Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
 
-    @Query("SELECT bh FROM BlogHistory bh JOIN bh.blog b WHERE bh.userEmail = :userEmail AND b.title = :title")
-    BlogHistory findByUserEmailAndBlogTitle(String userEmail, String title);
+        @Query("SELECT bh FROM BlogHistory bh JOIN bh.blog b WHERE bh.userEmail = :userEmail AND b.title = :title")
+        BlogHistory findByUserEmailAndBlogTitle(String userEmail, String title);
 
-    @Query(value = "SELECT * FROM public.blog_history " +
-            "WHERE created_at >= :fromDate " +
-            "AND created_at < (:toDate)::date + 1 and user_email=:email", nativeQuery = true)
-    List<BlogHistory> findByUserEmailAndCreatedAtBetween(String email, LocalDate fromDate, LocalDate toDate);
+        @Query(value = "SELECT * FROM public.blog_history " +
+                        "WHERE created_at >= :fromDate " +
+                        "AND created_at < (:toDate)::date + 1 and user_email=:email", nativeQuery = true)
+        List<BlogHistory> findByUserEmailAndCreatedAtBetween(String email, LocalDate fromDate, LocalDate toDate);
+
+        @Query("SELECT bh FROM BlogHistory bh WHERE bh.userEmail = :email AND bh.blog.id = :id")
+        BlogHistory findByUserEmailAndBlogId(String email, UUID id);
+
+        @Query(value = "SELECT * FROM public.blog_history " +
+                        "WHERE created_at >= :fromDate " +
+                        "AND created_at < (:toDate)::date + 1 and user_email=:email AND blog_id=:blogId", nativeQuery = true)
+        List<BlogHistory> getDataBetweenDatesAndCategoryAndEmail(LocalDate fromDate, LocalDate toDate, UUID blogId,
+                String email);
 }

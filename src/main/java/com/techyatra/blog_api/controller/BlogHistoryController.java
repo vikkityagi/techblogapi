@@ -44,4 +44,17 @@ public class BlogHistoryController {
     public boolean markPaid(@PathVariable UUID id, @PathVariable Boolean status) {
         return service.markAsPaid(id, status);
     }
+
+    @GetMapping("/blogs")
+    public List<BlogHistory> getBlogsByUser(@RequestParam String email,@RequestParam UUID categoryId) {
+        return service.getBlogByCategory(email, categoryId);
+    }
+
+    @GetMapping("/by-category")
+    public List<BlogHistory> getByCategoryIdAndDates(@RequestParam String email,
+                                                      @RequestParam LocalDate fromDate,
+                                                      @RequestParam LocalDate toDate,
+                                                      @RequestParam UUID categoryId) {
+        return service.getByCategoryIdAndDates(email, fromDate, toDate, categoryId);
+    }
 }

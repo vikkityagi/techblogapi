@@ -29,8 +29,9 @@ public class BlogController {
 
     @GetMapping
     public List<Blog> getAllBlogs(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
-        return service.getAll(fromDate, toDate);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate,
+            @RequestParam(value="category_id",required = false) UUID categoryId) {
+        return service.getAll(fromDate, toDate, categoryId);
     }
 
     @GetMapping("/today")
