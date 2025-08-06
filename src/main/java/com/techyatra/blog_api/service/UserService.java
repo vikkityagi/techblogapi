@@ -19,19 +19,20 @@ public class UserService {
         this.repo = repo;
     }
 
-    public User signup(User user) {
-        if (repo.findByEmail(user.getEmail()) != null) {
-            throw new RuntimeException("Email already registered");
+    public User signup(User user) throws Exception {
+            if (repo.findByEmail(user.getEmail()) != null) {
+                throw new Exception("Email already registered");
         }
-        return repo.save(user);
+        User savedUser = repo.save(user);
+        return savedUser;
     }
 
-    public User login(String email, String password) {
+    public User login(String email, String password) throws Exception {
         User user = repo.findByEmail(email);
-        if (user != null && user.getPassword().equals(password)) {
+        if (user != null && user.getPassword().equals(password) && user.getEmail().equals(email)) {
             return user;
         }
-        throw new RuntimeException("Invalid email or password");
+        throw new Exception("Invalid email or password");
     }
 
     public User getByEmail(String email) {
@@ -40,7 +41,7 @@ public class UserService {
 
     public User reset(User user){
         User newuser = repo.findByEmail(user.getEmail());
-        if(newuser != null){
+        if(newuser != null && newuser.getEmail().equals(user.getEmail())){
             newuser.setPassword(user.getPassword());
             repo.save(newuser);
         }else{

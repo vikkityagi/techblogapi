@@ -42,9 +42,11 @@ public class Blog extends BaseClass {
     @Column(nullable = false)
     private String titleNumber;
     
-    
     @Column(name = "category_id", nullable = false)
     private UUID category;
+
+    // @Column(name = "error_message")
+    // private String errorMessage;
 
     
 }

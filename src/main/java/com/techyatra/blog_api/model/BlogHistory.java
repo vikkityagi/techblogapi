@@ -31,4 +31,8 @@ public class BlogHistory extends BaseClass {
 
     @Column(nullable = false)
     private Boolean isPaid;
+
+    
+    // @Column(name = "error_message")
+    // private String errorMessage;
 }

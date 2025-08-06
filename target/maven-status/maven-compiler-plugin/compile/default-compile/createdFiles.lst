@@ -8,6 +8,7 @@ com\techyatra\blog_api\service\BlogService.class
 com\techyatra\blog_api\dto\CategoryDto.class
 com\techyatra\blog_api\repository\CategoryRepository.class
 com\techyatra\blog_api\controller\CategoryController.class
+com\techyatra\blog_api\controller\Levenshtein.class
 com\techyatra\blog_api\repository\BlogRepository.class
 com\techyatra\blog_api\controller\UserController.class
 com\techyatra\blog_api\dto\CategoryDto$CategoryDtoBuilder.class

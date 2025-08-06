@@ -10,6 +10,15 @@ public class BlogApiApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(BlogApiApplication.class, args);
+		// Create instance and call print
+		// BlogApiApplication app = new BlogApiApplication();
+		// app.print();
+
 	}
+
+	// public void print() {
+	// 	String message = "Hello, World!";
+	// 	System.out.println(Integer.MAX_VALUE);
+	// }
 
 }
