@@ -33,8 +33,6 @@ public class User extends BaseClass {
 
     @Column(nullable = false)
     @NotBlank(message = "Password is mandatory")
-    @Size(min = 6, message = "Password must be at least 6 characters")
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{6,}$", message = "Password must contain uppercase, number, and special character")
     private String password;
 
     @Column(nullable = false)
@@ -42,8 +40,15 @@ public class User extends BaseClass {
     @Pattern(regexp = "^(admin|user)$", message = "Role must be 'admin' or 'user'")
     private String role;
 
+
+
+    @Column(name = "is_verified", nullable = false,columnDefinition = "boolean default false")
+    private Boolean isVerify = false;
+
     @Column(name = "error_message")
     private String errorMessage;
+
+
 
     @PrePersist
     @PreUpdate
