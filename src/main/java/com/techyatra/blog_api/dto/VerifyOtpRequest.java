@@ -10,4 +10,5 @@ public class VerifyOtpRequest {
     private String message;
     private Boolean isVerify;
     private String otpReference;
+    private String role;
 }

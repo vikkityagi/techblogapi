@@ -1,6 +1,5 @@
 package com.techyatra.blog_api.dto;
 
-
 import lombok.*;
 
 import java.util.UUID;
@@ -26,10 +25,9 @@ public class UserRequestDto {
     @NotBlank(message = "Password is mandatory")
     private String password;
 
-    @NotBlank(message = "Role is required")
-    @Pattern(regexp = "^(admin|user)$", message = "Role must be 'admin' or 'user'")
+    @Pattern(regexp = "^(admin|user)?$", message = "Role must be 'admin' or 'user' if provided")
     private String role;
-    
+
     private Boolean isVerify;
     private String errorMessage;
     private String otpReference;

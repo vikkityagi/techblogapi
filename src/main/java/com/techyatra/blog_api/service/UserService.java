@@ -10,6 +10,9 @@ import com.techyatra.blog_api.repository.UserRepository;
 
 import ch.qos.logback.core.joran.util.beans.BeanUtil;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -21,7 +24,7 @@ import javax.management.RuntimeErrorException;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,6 +35,9 @@ public class UserService {
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final Set<String> generatedOtps = new HashSet<>();
     private static final Set<String> generateRefNo = ConcurrentHashMap.newKeySet();
+
+    @Value("${app.security.secret-key}")
+    private String secretKey;
 
     @Autowired
     public UserService(UserRepository repo, EmailService emailService) {
@@ -45,22 +51,39 @@ public class UserService {
         if (userObj != null && userObj.getIsVerify()) {
             throw new Exception("Email already registered");
         } else if (userObj == null || (userObj.getEmail() != null && !userObj.getIsVerify())) {
+
             if (userObj == null) {
                 userObj = new User();
                 userObj.setEmail(userRequestDto.getEmail());
-                userObj.setPassword(userRequestDto.getPassword());
+                String hashedPassword = hashPasswordSHA512(userRequestDto.getPassword(), secretKey);
+                userObj.setPassword(hashedPassword);
                 userObj.setRole(userRequestDto.getRole());
+            } else {
+                String hashedPassword = hashPasswordSHA512(userRequestDto.getPassword(), secretKey);
+                if (!hashedPassword.equals(userObj.getPassword())){
+                    throw new Exception("Old Password does not match with New Password, please update the password first");
+                }else{
+
+                    userObj.setPassword(hashedPassword);
+                }
             }
+
             OtpResponse otpDetails = generateOtpDetails();
             String otp = otpDetails.getOtp();
-            // if(userObj != null && userObj.getId() != null && userObj.getOtp().equals(otp)){
-            //     otpDetails = generateOtpDetails();
-            //     otp = otpDetails.getOtp();
+            // if(userObj != null && userObj.getId() != null &&
+            // userObj.getOtp().equals(otp)){
+            // otpDetails = generateOtpDetails();
+            // otp = otpDetails.getOtp();
             // }
-            emailService.sendOtpEmail(userObj.getEmail(), otp); // Send OTP via email
+            try {
+                emailService.sendOtpEmail(userObj.getEmail(), otp);
+            } catch (Exception e) {
+                throw new Exception("Could not send OTP: " + e.getMessage());
+                // return null;
+            }
             generateRefNo.add(otpDetails.getReferenceNumber());
             userRequestDto.setOtpReference(otpDetails.getReferenceNumber());
-            
+
         } else {
             throw new RuntimeErrorException(null, "Email must not be null");
         }
@@ -69,6 +92,7 @@ public class UserService {
         BeanUtils.copyProperties(savedUser, userRequestDto);
         userRequestDto.setOtpExpirationTime(emailService.getTime());
         userRequestDto.setIsVerify(userObj.getIsVerify());
+        // userRequestDto.setOtpReference(generateRefNo);
         return userRequestDto;
     }
 
@@ -82,7 +106,7 @@ public class UserService {
         if (!isOtpValid) {
             throw new RuntimeErrorException(null, "Invalid or expired OTP.");
         }
-        System.out.println("GeneratedRef No: "+generateRefNo+" otpRef: "+optRef);
+        System.out.println("GeneratedRef No: " + generateRefNo + " otpRef: " + optRef);
         if (generateRefNo.contains(optRef)) {
             user.setIsVerify(true);
             // user.setOtp(null);
@@ -91,6 +115,8 @@ public class UserService {
             request.setIsVerify(true);
             request.setMessage("OTP verified successfully");
             request.setOtp(otp);
+            request.setRole(user.getRole());
+            request.setEmail(email);
 
             generateRefNo.remove(optRef);
             return request;
@@ -99,10 +125,28 @@ public class UserService {
         }
     }
 
-    public User login(String email, String password) throws Exception {
+    public UserRequestDto login(String email, String password) throws Exception {
         User user = repo.findByEmail(email);
         if (user != null && user.getPassword().equals(password) && user.getEmail().equals(email)) {
-            return user;
+            if (user.getIsVerify() == null || !user.getIsVerify().booleanValue()) {
+                throw new Exception("User is Not Authorized or Verified");
+            }
+            OtpResponse otpDetails = generateOtpDetails();
+            String otp = otpDetails.getOtp();
+            try {
+                emailService.sendOtpEmail(user.getEmail(), otp);
+            } catch (Exception e) {
+                throw new Exception("Could not send OTP: " + e.getMessage());
+                // return null;
+            }
+            generateRefNo.add(otpDetails.getReferenceNumber());
+            UserRequestDto dto = new UserRequestDto();
+            BeanUtils.copyProperties(user, dto);
+            dto.setOtpExpirationTime(emailService.getTime());
+            dto.setIsVerify(user.getIsVerify());
+            dto.setOtpReference(otpDetails.getReferenceNumber());
+
+            return dto;
         }
         throw new Exception("Invalid email or password");
     }
@@ -114,7 +158,9 @@ public class UserService {
     public User reset(User user) {
         User newuser = repo.findByEmail(user.getEmail());
         if (newuser != null && newuser.getEmail().equals(user.getEmail())) {
-            newuser.setPassword(user.getPassword());
+            String hashedPassword = hashPasswordSHA512(user.getPassword(), secretKey);
+
+            newuser.setPassword(hashedPassword);
             repo.save(newuser);
         } else {
             throw new RuntimeException("Invalid Email");
@@ -151,6 +197,23 @@ public class UserService {
 
     public static void clearOtps() {
         generatedOtps.clear();
+    }
+
+    private String hashPasswordSHA512(String password, String secretKey) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            byte[] hashedBytes = md.digest((password + secretKey).getBytes(StandardCharsets.UTF_8));
+
+            // Convert byte array to hex string
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashedBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error hashing password", e);
+        }
     }
 
 }
